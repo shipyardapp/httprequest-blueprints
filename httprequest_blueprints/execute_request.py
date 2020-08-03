@@ -12,13 +12,13 @@ def get_args():
                         required=False, default=None)
     parser.add_argument('--message', dest='message', required=False)
     parser.add_argument(
-    '--print-response',
-    dest='print_response',
-    default='FALSE',
-    choices={
-        'TRUE',
-        'FALSE'},
-         required=False)
+        '--print-response',
+        dest='print_response',
+        default='FALSE',
+        choices={
+            'TRUE',
+            'FALSE'},
+        required=False)
     parser.add_argument(
         '--destination-file-name',
         dest='destination_file_name',
@@ -99,8 +99,10 @@ def main():
 
     with open(destination_name, 'w') as response_output:
         response_output.write(req.text)
+
     print(
-        f'Successfully sent request {url} and stored response to {destination_name}.'
+        f'Successfully sent request {url} and stored response to {destination_name}.')
+
     if print_response:
         print(f'\n\n Response body: {req.content}')
 
