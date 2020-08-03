@@ -11,6 +11,7 @@ def get_args():
     parser.add_argument('--authorization-header', dest='authorization_header',
                         required=False, default=None)
     parser.add_argument('--message', dest='message', required=False)
+    parser.add_argument('--print-response', dest='print_response', default='FALSE', choices={'TRUE', 'FALSE'} required=False)
     parser.add_argument(
         '--destination-file-name',
         dest='destination_file_name',
@@ -46,12 +47,25 @@ def clean_folder_name(folder_name):
     return folder_name
 
 
+def convert_to_boolean(string):
+    """
+    Shipyard can't support passing Booleans to code, so we have to convert
+    string values to their boolean values.
+    """
+    if string in ['True', 'true', 'TRUE']:
+        value = True
+    else:
+        value = False
+    return value
+
+
 def main():
     args = get_args()
     method = args.method
     url = args.url
     authorization_header = args.authorization_header
     message = args.message
+    print_response = convert_to_boolean(args.print_response)
     destination_file_name = args.destination_file_name
     destination_folder_name = clean_folder_name(args.destination_folder_name)
     destination_name = combine_folder_and_file_name(
@@ -79,7 +93,9 @@ def main():
     with open(destination_name, 'w') as response_output:
         response_output.write(req.text)
     print(
-        f'Successfully sent request {url} and stored response to {destination_name}. \n\n Response body: {req.content}')
+        f'Successfully sent request {url} and stored response to {destination_name}.'
+    if print_response:
+        print(f'\n\n Response body: {req.content}')
 
 
 if __name__ == '__main__':
