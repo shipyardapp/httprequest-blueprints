@@ -11,7 +11,14 @@ def get_args():
     parser.add_argument('--authorization-header', dest='authorization_header',
                         required=False, default=None)
     parser.add_argument('--message', dest='message', required=False)
-    parser.add_argument('--print-response', dest='print_response', default='FALSE', choices={'TRUE', 'FALSE'} required=False)
+    parser.add_argument(
+    '--print-response',
+    dest='print_response',
+    default='FALSE',
+    choices={
+        'TRUE',
+        'FALSE'},
+         required=False)
     parser.add_argument(
         '--destination-file-name',
         dest='destination_file_name',
