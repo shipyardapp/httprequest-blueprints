@@ -1,6 +1,7 @@
 import argparse
 import requests
 import os
+import code
 
 
 def get_args():
@@ -10,6 +11,17 @@ def get_args():
     parser.add_argument('--url', dest='url', required=True)
     parser.add_argument('--authorization-header', dest='authorization_header',
                         required=False, default=None)
+    parser.add_argument(
+        '--content-type',
+        dest='content_type',
+        required=False,
+        default=None,
+        choices={
+            'text/plain',
+            'application/xml',
+            'application/json',
+            'image/gif',
+            'image/jpeg'})
     parser.add_argument('--message', dest='message', required=False)
     parser.add_argument(
         '--print-response',
@@ -71,6 +83,7 @@ def main():
     method = args.method
     url = args.url
     authorization_header = args.authorization_header
+    content_type = args.content_type
     message = args.message
     print_response = convert_to_boolean(args.print_response)
     destination_file_name = args.destination_file_name
@@ -83,8 +96,10 @@ def main():
         os.makedirs(destination_folder_name)
 
     header = {}
+    if content_type:
+        header['Content-Type'] = content_type
     if authorization_header:
-        header = {'Authorization': authorization_header}
+        header['Authorization'] = authorization_header
 
     try:
         if method == 'GET':
