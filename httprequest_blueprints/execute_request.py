@@ -1,7 +1,6 @@
 import argparse
 import requests
 import os
-import code
 
 
 def get_args():
