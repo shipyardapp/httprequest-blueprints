@@ -20,8 +20,7 @@ def get_args():
             'text/plain',
             'application/xml',
             'application/json',
-            'image/gif',
-            'image/jpeg'})
+            'text/html'})
     parser.add_argument('--message', dest='message', required=False)
     parser.add_argument(
         '--print-response',
