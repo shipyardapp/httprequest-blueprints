@@ -6,10 +6,20 @@ import os
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--method', dest='method', required=True,
-                        choices={'GET', 'POST', 'PUT'})
+                        choices={'GET', 'POST', 'PUT', 'PATCH'})
     parser.add_argument('--url', dest='url', required=True)
     parser.add_argument('--authorization-header', dest='authorization_header',
                         required=False, default=None)
+    parser.add_argument(
+        '--content-type',
+        dest='content_type',
+        required=False,
+        default=None,
+        choices={
+            'text/plain',
+            'application/xml',
+            'application/json',
+            'text/html'})
     parser.add_argument('--message', dest='message', required=False)
     parser.add_argument(
         '--print-response',
@@ -71,6 +81,7 @@ def main():
     method = args.method
     url = args.url
     authorization_header = args.authorization_header
+    content_type = args.content_type
     message = args.message
     print_response = convert_to_boolean(args.print_response)
     destination_file_name = args.destination_file_name
@@ -83,8 +94,10 @@ def main():
         os.makedirs(destination_folder_name)
 
     header = {}
+    if content_type:
+        header['Content-Type'] = content_type
     if authorization_header:
-        header = {'Authorization': authorization_header}
+        header['Authorization'] = authorization_header
 
     try:
         if method == 'GET':
@@ -93,6 +106,8 @@ def main():
             req = requests.post(url, headers=header, data=message)
         elif method == 'PUT':
             req = requests.put(url, headers=header, data=message)
+        elif method == 'PATCH':
+            req = requests.patch(url, headers=header, data=message)
     except Exception as e:
         print(f'Failed to execute {method} request to {url}')
         raise(e)
