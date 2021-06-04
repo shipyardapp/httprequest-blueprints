@@ -65,7 +65,8 @@ def download_file(url, destination_name):
     print(f'Currently downloading the file from {url}...')
     with requests.get(url, stream=True) as r:
         with open(destination_name, 'wb') as f:
-            shutil.copyfileobj(r.raw, f)
+            for chunk in r.iter_content(chunk_size=(16 * 1024 * 1024)):
+                f.write(chunk)
     return
 
 
