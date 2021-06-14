@@ -1,6 +1,7 @@
 import argparse
 import requests
 import os
+import code
 
 
 def get_args():
@@ -103,7 +104,7 @@ def create_folder_if_dne(destination_folder_name):
         os.makedirs(destination_folder_name)
 
 
-def write_response_to_file(req):
+def write_response_to_file(req, destination_name):
     with open(destination_name, 'w') as response_output:
         response_output.write(req.text)
     return
@@ -127,11 +128,11 @@ def main():
         destination_folder_name, destination_file_name)
     header = {}
 
-    create_folder_if_dne(destination_file_name)
+    create_folder_if_dne(destination_folder_name)
     header = add_to_header(header, 'Content-Type', content_type)
     header = add_to_header(header, 'Authorization', authorization_header)
     req = execute_request(method, url, header, message)
-    write_response_to_file(req)
+    write_response_to_file(req, destination_name)
     print(
         f'Successfully sent request {url} and stored response to {destination_name}.')
 
