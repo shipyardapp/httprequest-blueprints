@@ -129,8 +129,10 @@ def main():
     header = {}
 
     create_folder_if_dne(destination_folder_name)
-    header = add_to_header(header, 'Content-Type', content_type)
-    header = add_to_header(header, 'Authorization', authorization_header)
+    if content_type:
+        header = add_to_header(header, 'Content-Type', content_type)
+    if authorization_header:
+        header = add_to_header(header, 'Authorization', authorization_header)
     req = execute_request(method, url, header, message)
     write_response_to_file(req, destination_name)
     print(
