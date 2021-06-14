@@ -76,29 +76,7 @@ def convert_to_boolean(string):
     return value
 
 
-def main():
-    args = get_args()
-    method = args.method
-    url = args.url
-    authorization_header = args.authorization_header
-    content_type = args.content_type
-    message = args.message
-    print_response = convert_to_boolean(args.print_response)
-    destination_file_name = args.destination_file_name
-    destination_folder_name = clean_folder_name(args.destination_folder_name)
-    destination_name = combine_folder_and_file_name(
-        destination_folder_name, destination_file_name)
-
-    if not os.path.exists(destination_folder_name) and (
-            destination_folder_name != ''):
-        os.makedirs(destination_folder_name)
-
-    header = {}
-    if content_type:
-        header['Content-Type'] = content_type
-    if authorization_header:
-        header['Authorization'] = authorization_header
-
+def execute_request(method, url, header, message=None):
     try:
         if method == 'GET':
             req = requests.get(url, headers=header)
@@ -111,15 +89,54 @@ def main():
     except Exception as e:
         print(f'Failed to execute {method} request to {url}')
         raise(e)
+    return req
 
+
+def add_to_header(header, key, value):
+    header[key] = value
+    return header
+
+
+def create_folder_if_dne(destination_folder_name):
+    if not os.path.exists(destination_folder_name) and (
+            destination_folder_name != ''):
+        os.makedirs(destination_folder_name)
+
+
+def write_response_to_file(req):
     with open(destination_name, 'w') as response_output:
         response_output.write(req.text)
+    return
 
+
+def print_response_to_output(req):
+    print(f'\n\n Response body: {req.content}')
+
+
+def main():
+    args = get_args()
+    method = args.method
+    url = args.url
+    authorization_header = args.authorization_header
+    content_type = args.content_type
+    message = args.message
+    print_response = convert_to_boolean(args.print_response)
+    destination_file_name = args.destination_file_name
+    destination_folder_name = clean_folder_name(args.destination_folder_name)
+    destination_name = combine_folder_and_file_name(
+        destination_folder_name, destination_file_name)
+    header = {}
+
+    create_folder_if_dne(destination_file_name)
+    header = add_to_header(header, 'Content-Type', content_type)
+    header = add_to_header(header, 'Authorization', authorization_header)
+    req = execute_request(method, url, header, message)
+    write_response_to_file(req)
     print(
         f'Successfully sent request {url} and stored response to {destination_name}.')
 
     if print_response:
-        print(f'\n\n Response body: {req.content}')
+        print_response_to_output()
 
 
 if __name__ == '__main__':
