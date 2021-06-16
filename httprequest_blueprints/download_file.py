@@ -61,9 +61,9 @@ def extract_filename_from_url(url):
     return file_name
 
 
-def download_file(url, destination_name):
+def download_file(url, destination_name, header=None):
     print(f'Currently downloading the file from {url}...')
-    with requests.get(url, stream=True) as r:
+    with requests.get(url, headers=header, stream=True) as r:
         with open(destination_name, 'wb') as f:
             for chunk in r.iter_content(chunk_size=(16 * 1024 * 1024)):
                 f.write(chunk)
