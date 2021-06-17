@@ -20,7 +20,7 @@ config = {
     "packages": find_packages(),
     "install_requires": install_requires,
     "name": "httprequest-blueprints",
-    "version": "v0.1.0",
+    "version": "v0.1.4",
     "license": "Apache-2.0",
     "classifiers": [
         "Intended Audience :: Developers",
