@@ -76,25 +76,34 @@ def convert_to_boolean(string):
     return value
 
 
-def execute_request(method, url, header, message=None):
+def execute_request(method, url, headers=None, message=None, params=None):
     try:
         if method == 'GET':
-            req = requests.get(url, headers=header)
+            req = requests.get(url, headers=headers, params=params)
         elif method == 'POST':
-            req = requests.post(url, headers=header, data=message)
+            req = requests.post(
+                url,
+                headers=headers,
+                data=message,
+                params=params)
         elif method == 'PUT':
-            req = requests.put(url, headers=header, data=message)
+            req = requests.put(
+                url,
+                headers=headers,
+                data=message,
+                params=params)
         elif method == 'PATCH':
-            req = requests.patch(url, headers=header, data=message)
+            req = requests.patch(
+                url, headers=headers, data=message, params=params)
     except Exception as e:
         print(f'Failed to execute {method} request to {url}')
         raise(e)
     return req
 
 
-def add_to_header(header, key, value):
-    header[key] = value
-    return header
+def add_to_headers(headers, key, value):
+    headers[key] = value
+    return headers
 
 
 def create_folder_if_dne(destination_folder_name):
@@ -125,14 +134,17 @@ def main():
     destination_folder_name = clean_folder_name(args.destination_folder_name)
     destination_name = combine_folder_and_file_name(
         destination_folder_name, destination_file_name)
-    header = {}
+    headers = {}
 
     create_folder_if_dne(destination_folder_name)
     if content_type:
-        header = add_to_header(header, 'Content-Type', content_type)
+        headers = add_to_headers(headers, 'Content-Type', content_type)
     if authorization_header:
-        header = add_to_header(header, 'Authorization', authorization_header)
-    req = execute_request(method, url, header, message)
+        headers = add_to_headers(
+            headers,
+            'Authorization',
+            authorization_header)
+    req = execute_request(method, url, headers, message)
     write_response_to_file(req, destination_name)
     print(
         f'Successfully sent request {url} and stored response to {destination_name}.')
