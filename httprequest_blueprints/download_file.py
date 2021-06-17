@@ -61,9 +61,9 @@ def extract_filename_from_url(url):
     return file_name
 
 
-def download_file(url, destination_name, header=None):
+def download_file(url, destination_name, headers=None, params=None):
     print(f'Currently downloading the file from {url}...')
-    with requests.get(url, headers=header, stream=True) as r:
+    with requests.get(url, headers=headers, stream=True, params=params) as r:
         with open(destination_name, 'wb') as f:
             for chunk in r.iter_content(chunk_size=(16 * 1024 * 1024)):
                 f.write(chunk)
@@ -71,9 +71,9 @@ def download_file(url, destination_name, header=None):
     return
 
 
-def add_to_header(header, key, value):
-    header[key] = value
-    return header
+def add_to_headers(headers, key, value):
+    headers[key] = value
+    return headers
 
 
 def create_folder_if_dne(destination_folder_name):
@@ -92,14 +92,18 @@ def main():
     destination_folder_name = clean_folder_name(args.destination_folder_name)
     destination_name = combine_folder_and_file_name(
         destination_folder_name, destination_file_name)
-    header = {}
+    headers = {}
+    params = {}
 
     create_folder_if_dne(destination_folder_name)
 
     if authorization_header:
-        header = add_to_header(header, 'Authorization', authorization_header)
+        headers = add_to_headers(
+            headers,
+            'Authorization',
+            authorization_header)
 
-    download_file(url, destination_name)
+    download_file(url, destination_name, headers, params)
 
 
 if __name__ == '__main__':
