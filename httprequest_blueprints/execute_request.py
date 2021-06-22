@@ -76,6 +76,52 @@ def convert_to_boolean(string):
     return value
 
 
+def execute_request(method, url, headers=None, message=None, params=None):
+    try:
+        if method == 'GET':
+            req = requests.get(url, headers=headers, params=params)
+        elif method == 'POST':
+            req = requests.post(
+                url,
+                headers=headers,
+                data=message,
+                params=params)
+        elif method == 'PUT':
+            req = requests.put(
+                url,
+                headers=headers,
+                data=message,
+                params=params)
+        elif method == 'PATCH':
+            req = requests.patch(
+                url, headers=headers, data=message, params=params)
+    except Exception as e:
+        print(f'Failed to execute {method} request to {url}')
+        raise(e)
+    return req
+
+
+def add_to_headers(headers, key, value):
+    headers[key] = value
+    return headers
+
+
+def create_folder_if_dne(destination_folder_name):
+    if not os.path.exists(destination_folder_name) and (
+            destination_folder_name != ''):
+        os.makedirs(destination_folder_name)
+
+
+def write_response_to_file(req, destination_name):
+    with open(destination_name, 'w') as response_output:
+        response_output.write(req.text)
+    return
+
+
+def print_response_to_output(req):
+    print(f'\n\n Response body: {req.content}')
+
+
 def main():
     args = get_args()
     method = args.method
@@ -88,38 +134,23 @@ def main():
     destination_folder_name = clean_folder_name(args.destination_folder_name)
     destination_name = combine_folder_and_file_name(
         destination_folder_name, destination_file_name)
+    headers = {}
 
-    if not os.path.exists(destination_folder_name) and (
-            destination_folder_name != ''):
-        os.makedirs(destination_folder_name)
-
-    header = {}
+    create_folder_if_dne(destination_folder_name)
     if content_type:
-        header['Content-Type'] = content_type
+        headers = add_to_headers(headers, 'Content-Type', content_type)
     if authorization_header:
-        header['Authorization'] = authorization_header
-
-    try:
-        if method == 'GET':
-            req = requests.get(url, headers=header)
-        elif method == 'POST':
-            req = requests.post(url, headers=header, data=message)
-        elif method == 'PUT':
-            req = requests.put(url, headers=header, data=message)
-        elif method == 'PATCH':
-            req = requests.patch(url, headers=header, data=message)
-    except Exception as e:
-        print(f'Failed to execute {method} request to {url}')
-        raise(e)
-
-    with open(destination_name, 'w') as response_output:
-        response_output.write(req.text)
-
+        headers = add_to_headers(
+            headers,
+            'Authorization',
+            authorization_header)
+    req = execute_request(method, url, headers, message)
+    write_response_to_file(req, destination_name)
     print(
         f'Successfully sent request {url} and stored response to {destination_name}.')
 
     if print_response:
-        print(f'\n\n Response body: {req.content}')
+        print_response_to_output()
 
 
 if __name__ == '__main__':

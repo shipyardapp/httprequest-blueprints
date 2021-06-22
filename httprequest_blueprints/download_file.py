@@ -61,13 +61,25 @@ def extract_filename_from_url(url):
     return file_name
 
 
-def download_file(url, destination_name):
+def download_file(url, destination_name, headers=None, params=None):
     print(f'Currently downloading the file from {url}...')
-    with requests.get(url, stream=True) as r:
+    with requests.get(url, headers=headers, stream=True, params=params) as r:
         with open(destination_name, 'wb') as f:
             for chunk in r.iter_content(chunk_size=(16 * 1024 * 1024)):
                 f.write(chunk)
+    print(f'Successfully downloaded {url} to {destination_name}.')
     return
+
+
+def add_to_headers(headers, key, value):
+    headers[key] = value
+    return headers
+
+
+def create_folder_if_dne(destination_folder_name):
+    if not os.path.exists(destination_folder_name) and (
+            destination_folder_name != ''):
+        os.makedirs(destination_folder_name)
 
 
 def main():
@@ -80,19 +92,18 @@ def main():
     destination_folder_name = clean_folder_name(args.destination_folder_name)
     destination_name = combine_folder_and_file_name(
         destination_folder_name, destination_file_name)
+    headers = {}
+    params = {}
 
-    if not os.path.exists(destination_folder_name) and (
-            destination_folder_name != ''):
-        os.makedirs(destination_folder_name)
+    create_folder_if_dne(destination_folder_name)
 
-    header = {}
     if authorization_header:
-        header['Authorization'] = authorization_header
+        headers = add_to_headers(
+            headers,
+            'Authorization',
+            authorization_header)
 
-    download_file(url, destination_name)
-
-    print(
-        f'Successfully downloaded {url} to {destination_name}.')
+    download_file(url, destination_name, headers, params)
 
 
 if __name__ == '__main__':
