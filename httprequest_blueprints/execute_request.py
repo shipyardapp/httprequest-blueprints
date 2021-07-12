@@ -1,6 +1,8 @@
 import argparse
 import requests
 import os
+import sys
+import hashlib
 
 
 def get_args():
@@ -95,9 +97,22 @@ def execute_request(method, url, headers=None, message=None, params=None):
         elif method == 'PATCH':
             req = requests.patch(
                 url, headers=headers, data=message, params=params)
-    except Exception as e:
-        print(f'Failed to execute {method} request to {url}')
-        raise(e)
+    except requests.exceptions.HTTPError as eh:
+        print(
+            'URL returned an HTTP Error.\n',
+            eh)
+        sys.exit(1)
+    except requests.exceptions.ConnectionError as ec:
+        print(
+            'Could not connect to the URL. Check to make sure that it was typed correctly.\n',
+            ec)
+        sys.exit(2)
+    except requests.exceptions.Timeout as et:
+        print('Timed out while connecting to the URL.\n', et)
+        sys.exit(3)
+    except requests.exceptions.RequestException as e:
+        print('Unexpected error occured. Please try again.\n', e)
+        exit(4)
     return req
 
 
@@ -122,14 +137,28 @@ def print_response_to_output(req):
     print(f'\n\n Response body: {req.content}')
 
 
+def hash_text(text_var):
+    hashed_text = hashlib.sha256(text_var.encode('ascii')).hexdigest()
+    return hashed_text
+
+
 def main():
     args = get_args()
     method = args.method
     url = args.url
+    url_hash = hash_text(url)
     authorization_header = args.authorization_header
     content_type = args.content_type
     message = args.message
     print_response = convert_to_boolean(args.print_response)
+
+    artifact_directory_default = f'{os.environ.get("USER")}-artifacts'
+    base_folder_name = clean_folder_name(
+        f'{os.environ.get("SHIPYARD_ARTIFACTS_DIRECTORY",artifact_directory_default)}/httprequest-blueprints/responses')
+    artifact_directory_location = combine_folder_and_file_name(
+        base_folder_name, f'{method.lower()}_{url_hash}.txt')
+    create_folder_if_dne(base_folder_name)
+
     destination_file_name = args.destination_file_name
     destination_folder_name = clean_folder_name(args.destination_folder_name)
     destination_name = combine_folder_and_file_name(
@@ -148,6 +177,9 @@ def main():
     write_response_to_file(req, destination_name)
     print(
         f'Successfully sent request {url} and stored response to {destination_name}.')
+
+    write_response_to_file(req, artifact_directory_location)
+    print(f'Artifact stored at {artifact_directory_location}')
 
     if print_response:
         print_response_to_output()
