@@ -95,9 +95,22 @@ def execute_request(method, url, headers=None, message=None, params=None):
         elif method == 'PATCH':
             req = requests.patch(
                 url, headers=headers, data=message, params=params)
-    except Exception as e:
-        print(f'Failed to execute {method} request to {url}')
-        raise(e)
+    except requests.exceptions.HTTPError as eh:
+        print(
+            'URL returned an HTTP Error.\n',
+            eh)
+        sys.exit(1)
+    except requests.exceptions.ConnectionError as ec:
+        print(
+            'Could not connect to the URL. Check to make sure that it was typed correctly.\n',
+            ec)
+        sys.exit(2)
+    except requests.exceptions.Timeout as et:
+        print('Timed out while connecting to the URL.\n', et)
+        sys.exit(3)
+    except requests.exceptions.RequestException as e:
+        print('Unexpected error occured. Please try again.\n', e)
+        exit(4)
     return req
 
 
