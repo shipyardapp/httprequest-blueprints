@@ -112,7 +112,7 @@ def execute_request(method, url, headers=None, message=None, params=None):
         sys.exit(3)
     except requests.exceptions.RequestException as e:
         print('Unexpected error occured. Please try again.\n', e)
-        exit(4)
+        sys.exit(4)
     return req
 
 
@@ -175,6 +175,7 @@ def main():
             authorization_header)
     req = execute_request(method, url, headers, message)
     write_response_to_file(req, destination_name)
+
     print(
         f'Successfully sent request {url} and stored response to {destination_name}.')
 

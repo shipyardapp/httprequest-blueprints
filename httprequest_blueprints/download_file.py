@@ -85,7 +85,7 @@ def download_file(url, destination_name, headers=None, params=None):
         sys.exit(3)
     except requests.exceptions.RequestException as e:
         print('Unexpected error occured. Please try again.\n', e)
-        exit(4)
+        sys.exit(4)
     return
 
 
@@ -122,6 +122,12 @@ def main():
             authorization_header)
 
     download_file(url, destination_name, headers, params)
+    written_file_size = os.path.getsize(destination_name)
+    print(
+        f'The downloaded file contained {written_file_size/1000000}MB of data.')
+    if written_file_size == 0:
+        print('File downloaded contained no data.')
+        sys.exit(5)
 
 
 if __name__ == '__main__':
