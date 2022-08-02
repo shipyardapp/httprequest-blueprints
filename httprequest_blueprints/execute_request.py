@@ -183,7 +183,7 @@ def main():
     print(f'Artifact stored at {artifact_directory_location}')
 
     if print_response:
-        print_response_to_output()
+        print_response_to_output(req)
 
 
 if __name__ == '__main__':
