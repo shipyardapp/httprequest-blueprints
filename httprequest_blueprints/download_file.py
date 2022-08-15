@@ -10,11 +10,11 @@ def get_args():
     parser.add_argument('--url', dest='url', required=True)
     parser.add_argument('--custom-headers', dest='custom_headers',
                         required=False, default='{}')
-    # Authorization header is separated so it can be obfuscated
+    # authentication header is separated so it can be obfuscated
     # as a password type in the Blueprint.
     parser.add_argument(
-        '--authorization-headers',
-        dest='authorization_headers',
+        '--authentication-headers',
+        dest='authentication_headers',
         required=False,
         default='{}')
     parser.add_argument(
@@ -113,7 +113,7 @@ def main():
     args = get_args()
     url = args.url
     custom_headers = json.loads(args.custom_headers)
-    authorization_headers = json.loads(args.authorization_headers)
+    authentication_headers = json.loads(args.authentication_headers)
     destination_file_name = args.destination_file_name
     if not destination_file_name:
         destination_file_name = extract_filename_from_url(url)
@@ -127,7 +127,7 @@ def main():
     if custom_headers:
         for key, value in custom_headers.items():
             headers = add_to_headers(headers, key, value)
-    if authorization_headers:
+    if authentication_headers:
         for key, value in custom_headers.items():
             headers = add_to_headers(headers, key, value)
 
