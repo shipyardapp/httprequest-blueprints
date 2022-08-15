@@ -2,13 +2,21 @@ import argparse
 import requests
 import os
 import sys
+import json
 
 
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--url', dest='url', required=True)
-    parser.add_argument('--authorization-header', dest='authorization_header',
-                        required=False, default=None)
+    parser.add_argument('--custom-headers', dest='custom_headers',
+                        required=False, default='{}')
+    # Authorization header is separated so it can be obfuscated
+    # as a password type in the Blueprint.
+    parser.add_argument(
+        '--authorization-headers',
+        dest='authorization_headers',
+        required=False,
+        default='{}')
     parser.add_argument(
         '--destination-file-name',
         dest='destination_file_name',
@@ -69,6 +77,7 @@ def download_file(url, destination_name, headers=None, params=None):
             with open(destination_name, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=(16 * 1024 * 1024)):
                     f.write(chunk)
+
         print(f'Successfully downloaded {url} to {destination_name}.')
     except requests.exceptions.HTTPError as eh:
         print(
@@ -103,7 +112,8 @@ def create_folder_if_dne(destination_folder_name):
 def main():
     args = get_args()
     url = args.url
-    authorization_header = args.authorization_header
+    custom_headers = json.loads(args.custom_headers)
+    authorization_headers = json.loads(args.authorization_headers)
     destination_file_name = args.destination_file_name
     if not destination_file_name:
         destination_file_name = extract_filename_from_url(url)
@@ -114,12 +124,12 @@ def main():
     params = {}
 
     create_folder_if_dne(destination_folder_name)
-
-    if authorization_header:
-        headers = add_to_headers(
-            headers,
-            'Authorization',
-            authorization_header)
+    if custom_headers:
+        for key, value in custom_headers.items():
+            headers = add_to_headers(headers, key, value)
+    if authorization_headers:
+        for key, value in custom_headers.items():
+            headers = add_to_headers(headers, key, value)
 
     download_file(url, destination_name, headers, params)
     written_file_size = os.path.getsize(destination_name)
