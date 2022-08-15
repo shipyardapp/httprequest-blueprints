@@ -112,15 +112,16 @@ def create_folder_if_dne(destination_folder_name):
 def main():
     args = get_args()
     url = args.url
+
     if args.custom_headers == '':
         custom_headers = json.loads('{}')
     else:
         custom_headers = json.loads(args.custom_headers)
+
     if args.authentication_headers == '':
         authentication_headers = json.loads('{}')
     else:
         authentication_headers = json.loads(args.authentication_headers)
-    authentication_headers = json.loads(args.authentication_headers)
     destination_file_name = args.destination_file_name
     if not destination_file_name:
         destination_file_name = extract_filename_from_url(url)
