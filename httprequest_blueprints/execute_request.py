@@ -16,12 +16,7 @@ def get_args():
         '--content-type',
         dest='content_type',
         required=False,
-        default=None,
-        choices={
-            'text/plain',
-            'application/xml',
-            'application/json',
-            'text/html'})
+        default=None)
     parser.add_argument('--message', dest='message', required=False)
     parser.add_argument(
         '--print-response',
